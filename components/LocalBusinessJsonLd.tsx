@@ -3,6 +3,8 @@ export default function LocalBusinessJsonLd() {
     "@context": "https://schema.org",
     "@type": "AutoBodyShop",
     name: "Murray's Auto Body",
+    description:
+      "Professional collision and auto body repair in Westford, Massachusetts. Collision repair, dent repair, paint matching, frame repair, scratch removal, and insurance claims assistance.",
     image: "https://www.murraysautobody.com/og.jpg",
     "@id": "https://www.murraysautobody.com",
     url: "https://www.murraysautobody.com",
@@ -15,7 +17,14 @@ export default function LocalBusinessJsonLd() {
       postalCode: "01886",
       addressCountry: "US",
     },
-    areaServed: ["Westford", "Chelmsford", "Littleton", "Acton", "Carlisle"],
+    areaServed: [
+      { "@type": "City", name: "Westford" },
+      { "@type": "City", name: "Chelmsford" },
+      { "@type": "City", name: "Littleton" },
+      { "@type": "City", name: "Acton" },
+      { "@type": "City", name: "Carlisle" },
+      { "@type": "City", name: "Tyngsborough" },
+    ],
     priceRange: "$$",
     openingHoursSpecification: [
       {
@@ -25,6 +34,21 @@ export default function LocalBusinessJsonLd() {
         closes: "17:00",
       },
     ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Auto Body Services",
+      itemListElement: [
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Collision Repair" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Dent Repair" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Paint Matching" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Frame Repair" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Scratch Removal" } },
+        {
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: "Insurance Claims Assistance" },
+        },
+      ],
+    },
   };
 
   return (

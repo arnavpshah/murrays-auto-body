@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Phone, MapPin } from "lucide-react";
 
 export default function Hero() {
@@ -15,9 +16,15 @@ export default function Hero() {
             Serving the Westford community with professional auto body and collision repair services.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-md bg-red-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-red-700 transition-colors"
+            >
+              Request an Estimate
+            </Link>
             <a
               href="tel:+19786922471"
-              className="inline-flex items-center gap-2 rounded-md bg-red-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-red-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-md border border-neutral-300 bg-white px-5 py-3 text-base font-semibold text-neutral-900 shadow-sm hover:border-neutral-400 transition-colors"
             >
               <Phone className="h-5 w-5" aria-hidden />
               Call Now
@@ -29,7 +36,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 rounded-md border border-neutral-300 bg-white px-5 py-3 text-base font-semibold text-neutral-900 shadow-sm hover:border-neutral-400 transition-colors"
             >
               <MapPin className="h-5 w-5" aria-hidden />
-              Get Directions
+              Directions
             </a>
           </div>
         </div>

@@ -7,8 +7,16 @@ create table if not exists public.inquiries (
   phone text not null,
   email text not null,
   message text not null,
+  vehicle text,
+  service_type text,
+  photo_urls text[] not null default '{}',
   created_at timestamptz not null default now()
 );
+
+-- Idempotent column adds for existing installs
+alter table public.inquiries add column if not exists vehicle text;
+alter table public.inquiries add column if not exists service_type text;
+alter table public.inquiries add column if not exists photo_urls text[] not null default '{}';
 
 alter table public.inquiries enable row level security;
 

@@ -1,32 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import { Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { Send, CheckCircle2, AlertCircle, Upload, X } from "lucide-react";
 
 type Status = "idle" | "submitting" | "success" | "error";
+
+const MAX_FILES = 4;
+const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB per photo
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [files, setFiles] = useState<File[]>([]);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const incoming = Array.from(e.target.files ?? []);
+    const merged = [...files, ...incoming]
+      .filter((f) => f.size <= MAX_FILE_BYTES)
+      .slice(0, MAX_FILES);
+    setFiles(merged);
+    e.target.value = "";
+  }
+
+  function removeFile(idx: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
-    const formData = new FormData(event.currentTarget);
-    const payload = {
-      name: String(formData.get("name") || ""),
-      phone: String(formData.get("phone") || ""),
-      email: String(formData.get("email") || ""),
-      message: String(formData.get("message") || ""),
-    };
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    files.forEach((file) => formData.append("photos", file));
 
     try {
       const res = await fetch("/api/inquiries", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -35,7 +47,8 @@ export default function ContactForm() {
       }
 
       setStatus("success");
-      event.currentTarget.reset();
+      form.reset();
+      setFiles([]);
     } catch (err) {
       setStatus("error");
       setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
@@ -87,17 +100,97 @@ export default function ContactForm() {
         </div>
       </div>
 
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="vehicle" className="block text-sm font-medium text-neutral-900">
+            Vehicle <span className="text-neutral-500">(year, make, model)</span>
+          </label>
+          <input
+            id="vehicle"
+            name="vehicle"
+            type="text"
+            placeholder="e.g. 2019 Toyota RAV4"
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+          />
+        </div>
+        <div>
+          <label htmlFor="serviceType" className="block text-sm font-medium text-neutral-900">
+            Service needed
+          </label>
+          <select
+            id="serviceType"
+            name="serviceType"
+            defaultValue=""
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+          >
+            <option value="">Not sure yet</option>
+            <option>Collision Repair</option>
+            <option>Dent Repair</option>
+            <option>Paint Matching</option>
+            <option>Frame Repair</option>
+            <option>Scratch Removal</option>
+            <option>Insurance Claims Assistance</option>
+          </select>
+        </div>
+      </div>
+
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-neutral-900">
-          Message
+          Describe the damage
         </label>
         <textarea
           id="message"
           name="message"
           rows={5}
           required
+          placeholder="A short description helps us prepare an accurate estimate."
           className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-neutral-900">
+          Photos of the damage <span className="text-neutral-500">(optional, up to {MAX_FILES})</span>
+        </label>
+        <label
+          htmlFor="photos"
+          className="mt-1 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-neutral-300 bg-white px-4 py-6 text-sm text-neutral-600 hover:border-red-400 hover:text-red-600 transition-colors"
+        >
+          <Upload className="h-5 w-5" aria-hidden />
+          <span>Upload photos (JPG/PNG, up to 8MB each)</span>
+        </label>
+        <input
+          id="photos"
+          name="photos"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className="sr-only"
+        />
+        {files.length > 0 && (
+          <ul className="mt-3 space-y-2">
+            {files.map((file, idx) => (
+              <li
+                key={`${file.name}-${idx}`}
+                className="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm"
+              >
+                <span className="truncate text-neutral-700">
+                  {file.name}{" "}
+                  <span className="text-neutral-400">({Math.round(file.size / 1024)} KB)</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeFile(idx)}
+                  className="ml-3 inline-flex items-center text-neutral-500 hover:text-red-600"
+                  aria-label={`Remove ${file.name}`}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <button
