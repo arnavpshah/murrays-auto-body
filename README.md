@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Murray's Auto Body
 
-## Getting Started
+MVP website for Murray's Auto Body — a local collision repair shop in Westford, MA.
 
-First, run the development server:
+Built with Next.js 16, TypeScript, Tailwind CSS, and Supabase (for contact form submissions).
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` — Home (hero, trust bar, services, gallery, location)
+- `/services` — All services
+- `/gallery` — Before/after photos
+- `/contact` — Contact form + map
 
-## Learn More
+## Folder structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+/app
+  /services
+  /gallery
+  /contact
+  /api/inquiries     <- POST endpoint for the contact form
+/components          <- Navbar, Footer, Hero, ServiceCard, GalleryGrid, ...
+/lib                 <- supabase client
+/public/images       <- shop photos go here
+/supabase/schema.sql <- DB schema
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Supabase setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a Supabase project.
+2. Run `supabase/schema.sql` in the SQL editor (creates the `inquiries` table).
+3. Copy `.env.local.example` → `.env.local` and fill in:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` *(optional, recommended — used by the server route to bypass RLS)*
 
-## Deploy on Vercel
+If env vars are missing, the API route accepts the submission and logs it to the console. This keeps local development unblocked.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Replacing placeholder content
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Shop photo (Hero):** drop a high-res photo into `public/images/hero.jpg` and update `components/Hero.tsx` to render it via `next/image`.
+- **Before/after gallery:** replace the placeholder gradients in `components/GalleryGrid.tsx` with actual images from `public/images/`.
+- **Hours:** confirm the actual shop hours and update `components/LocationContact.tsx` and `app/contact/page.tsx`.
+- **Domain:** update `SITE_URL` in `app/layout.tsx`, `app/sitemap.ts`, `app/robots.ts`, and `components/LocalBusinessJsonLd.tsx` to match the real domain.
+
+## Deployment
+
+1. Push this folder to GitHub.
+2. Import the repo at [vercel.com/new](https://vercel.com/new).
+3. Add the Supabase env vars in Vercel's project settings.
+4. Deploy.
+
+## Local SEO
+
+After deployment, create a [Google Business Profile](https://www.google.com/business/) with the address, phone, hours, and shop photos. This is the single highest-leverage step for ranking on "auto body near me" searches.
